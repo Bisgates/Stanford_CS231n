@@ -79,10 +79,10 @@ def svm_loss_vectorized(W, X, y, reg):
 	#############################################################################
 	
 	Y = X.dot(W)
-	Y_true = np.expand_dims(Y[range(num_train), np.squeeze(y)], axis=1)
+	Y_true = np.expand_dims(Y[range(num_train), y.squeeze()], axis=1)
 	Y_true = np.tile(Y_true, num_classes)
 
-	loss = np.sum((Y - Y_true + 1).clip(min=0))/num_train - 1
+	loss = (Y - Y_true + 1).clip(min=0).sum() / num_train - 1
 	loss += reg * np.sum(W * W)
 
 
@@ -101,10 +101,10 @@ def svm_loss_vectorized(W, X, y, reg):
 	# loss.                                                                     #
 	#############################################################################
 	
-	dy = ((Y - Y_true + 1)>0).astype(np.int32)
-	dy[range(num_train), np.squeeze(y)] -= np.sum(dy, axis=1)
-	
-	dW = X.T.dot(dy)/num_train + reg * 2 * W
+	dy = ((Y - Y_true + 1) > 0).astype(np.int32)
+	dy[range(num_train), y.squeeze()] -= dy.sum(axis=1)
+
+	dW = X.T.dot(dy) / num_train + reg * 2 * W
 
 	#############################################################################
 	#                             END OF YOUR CODE                              #
